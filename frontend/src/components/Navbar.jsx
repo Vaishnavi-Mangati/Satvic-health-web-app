@@ -7,6 +7,7 @@ import { UserContext } from '../context/UserContext'
 const navigation = [
   { name: 'Dashboard', href: '/dashboard' },
   { name: 'My Plan', href: '/my-plan' },
+  { name: 'Smart Cart', href: '/cart' },
   { name: 'Take Quiz', href: '/quiz' },
 ]
 
@@ -20,7 +21,7 @@ export default function Navbar() {
   const { user, logout } = useContext(UserContext);
 
   const filteredNavigation = navigation.filter(item => {
-    if (item.name === 'Dashboard' || item.name === 'My Plan') {
+    if (['Dashboard', 'My Plan', 'Smart Cart'].includes(item.name)) {
       return !!user; // Only members see these
     }
     if (item.name === 'Take Quiz' && user) {

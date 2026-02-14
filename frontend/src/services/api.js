@@ -64,3 +64,62 @@ export const getProgressHistory = async (userId, days = 30) => {
     throw error;
   }
 };
+export const getCatalog = async () => {
+  try {
+    const response = await api.get('/cart/catalog');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching catalog:", error);
+    throw error;
+  }
+};
+
+export const getCart = async () => {
+  try {
+    const response = await api.get('/cart');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching cart:", error);
+    throw error;
+  }
+};
+
+export const addToCart = async (product) => {
+  try {
+    const response = await api.post('/cart/add', product);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    throw error;
+  }
+};
+
+export const updateQuantity = async (name, quantity) => {
+  try {
+    const response = await api.patch('/cart/quantity', { name, quantity });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating quantity:", error);
+    throw error;
+  }
+};
+
+export const removeFromCart = async (name) => {
+  try {
+    const response = await api.delete(`/cart/remove/${name}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error removing from cart:", error);
+    throw error;
+  }
+};
+
+export const clearCart = async () => {
+  try {
+    const response = await api.delete('/cart/clear');
+    return response.data;
+  } catch (error) {
+    console.error("Error clearing cart:", error);
+    throw error;
+  }
+};

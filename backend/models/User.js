@@ -13,7 +13,13 @@ const userSchema = new mongoose.Schema({
     vata: { type: Number, default: 0 },
     pitta: { type: Number, default: 0 },
     kapha: { type: Number, default: 0 }
-  }
+  },
+  cartItems: [{
+    name: { type: String, required: true },
+    isBought: { type: Boolean, default: false },
+    category: { type: String, default: 'General' },
+    quantity: { type: Number, default: 1 }
+  }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

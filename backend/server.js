@@ -25,6 +25,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/plans', require('./routes/planRoutes'));
 app.use('/api/progress', require('./routes/progressRoutes'));
+app.use('/api/cart', require('./routes/cartRoutes'));
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URI)

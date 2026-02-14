@@ -5,7 +5,7 @@ const dailyProgressSchema = new mongoose.Schema({
   date: { type: String, required: true }, // Format: YYYY-MM-DD for easy lookup
   completedItems: [{
     itemId: String, // Reference to meal name or exercise name
-    type: { type: String, enum: ['Meal', 'Exercise'] }
+    type: { type: String, enum: ['Meal', 'Exercise', 'Ritual'] }
   }]
 }, { timestamps: true });
 

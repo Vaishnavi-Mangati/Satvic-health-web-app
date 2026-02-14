@@ -4,6 +4,7 @@ import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import { Route, Routes } from 'react-router-dom'
 import MyPlan from './pages/MyPlan'
+import MarketCart from './pages/MarketCart'
 import Dashboard from './pages/Dashboard'
 
 import Register from './pages/Register';
@@ -20,6 +21,7 @@ const App = () => {
       <Route path='/register' element={<Register />} />
       <Route path='/my-plan' element={<ProtectedRoute><MyPlan /></ProtectedRoute>} />
       <Route path='/dashboard' element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path='/cart' element={<ProtectedRoute><MarketCart /></ProtectedRoute>} />
     </Routes>
   )
 }
