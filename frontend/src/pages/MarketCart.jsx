@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { getCart, getCatalog, addToCart, updateQuantity, removeFromCart, clearCart } from '../services/api';
 import Navbar from '../components/Navbar';
+import { UserContext } from '../context/UserContext';
 import {
-    ShoppingCartIcon,
     PlusIcon,
     MinusIcon,
     TrashIcon,
@@ -12,10 +12,13 @@ import {
     FaceFrownIcon,
     ShoppingBagIcon,
     CakeIcon,
-    BoltIcon
+    BoltIcon,
+    HeartIcon,
+    ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 
 const MarketCart = () => {
+    const { user } = useContext(UserContext);
     const [cart, setCart] = useState([]);
     const [catalog, setCatalog] = useState([]);
     const [view, setView] = useState('shop'); // 'shop' or 'cart'
@@ -90,6 +93,39 @@ const MarketCart = () => {
         }
     };
 
+    // Smart Matchmaking Logic
+    const getSmartStatus = (product) => {
+        if (!user) return null;
+
+        const conditions = user.healthConditions || [];
+        const bmiCat = user.physicalStats?.category;
+
+        // 1. Check for Cautions (Red Flag)
+        const activeCautions = (product.cautions || []).filter(c =>
+            conditions.includes(c) || (c === bmiCat)
+        );
+
+        if (activeCautions.length > 0) {
+            return { type: 'caution', message: `Caution: Not ideal for ${activeCautions[0]}` };
+        }
+
+        // 2. Check for Benefits (Green Flag)
+        const matchingBenefits = (product.benefits || []).filter(b => {
+            if (conditions.includes('Diabetes') && b === 'Sugar-Balance') return true;
+            if (conditions.includes('High BP') && b === 'Heart-Health') return true;
+            if (bmiCat === 'Overweight' || bmiCat === 'Obese') {
+                if (b === 'Metabolism' || b === 'Weight-Loss') return true;
+            }
+            return false;
+        });
+
+        if (matchingBenefits.length > 0) {
+            return { type: 'benefit', message: "Doctor's Recommendation" };
+        }
+
+        return null;
+    };
+
     const subCategories = [...new Set(catalog.filter(p => p.mainCategory === activeMainCategory).map(p => p.subCategory))];
     const catalogBySelection = catalog.filter(p => p.mainCategory === activeMainCategory && p.subCategory === activeSubCategory);
     const totalItemsInCart = (cart || []).reduce((acc, curr) => acc + (curr.quantity || 0), 0);
@@ -139,6 +175,29 @@ const MarketCart = () => {
                     </div>
                 ) : view === 'shop' ? (
                     <div className="space-y-12 animate-in fade-in duration-700">
+                        {/* Health Profile Snapshot */}
+                        {user && (
+                            <div className="p-6 bg-white border border-gray-100 rounded-[2.5rem] shadow-sm flex flex-wrap items-center justify-between gap-6 px-10">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center">
+                                        <HeartIcon className="w-6 h-6 text-indigo-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Profile</p>
+                                        <p className="text-sm font-black text-gray-900">{user.bodyType} • BMI {user.physicalStats?.category}</p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-4">
+                                    {user.healthConditions?.filter(c => c !== 'None').map(c => (
+                                        <span key={c} className="px-4 py-2 bg-indigo-50 rounded-xl text-[10px] font-black text-indigo-600 uppercase tracking-widest border border-indigo-100">{c}</span>
+                                    ))}
+                                    {(!user.healthConditions || user.healthConditions.includes('None')) && (
+                                        <span className="px-4 py-2 bg-green-50 rounded-xl text-[10px] font-black text-green-600 uppercase tracking-widest border border-green-100">Optimal Health</span>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Main Category Tabs */}
                         <div className="flex justify-center md:justify-start gap-4">
                             <button
@@ -176,35 +235,50 @@ const MarketCart = () => {
                             {/* Product Grid */}
                             <div className="flex-1 space-y-12">
                                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                                    {catalogBySelection.map(product => (
-                                        <div key={product.name} className="bg-white border border-gray-100 rounded-[2.5rem] p-4 hover:shadow-[0_20px_50px_rgba(79,70,229,0.1)] transition-all duration-500 group relative">
-                                            {/* Image Placeholder */}
-                                            <div className="aspect-[4/5] bg-gray-50 rounded-[2rem] mb-6 flex items-center justify-center overflow-hidden border border-gray-50 group-hover:border-indigo-50 transition-colors relative">
-                                                <ArchiveBoxIcon className="w-16 h-16 text-gray-200 group-hover:scale-110 transition-transform duration-500" />
-                                                <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black text-indigo-600 uppercase tracking-widest border border-indigo-50 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
-                                                    Organic Choice
+                                    {catalogBySelection.map(product => {
+                                        const smartStatus = getSmartStatus(product);
+                                        return (
+                                            <div key={product.name} className="bg-white border border-gray-100 rounded-[2.5rem] p-4 hover:shadow-[0_20px_50px_rgba(79,70,229,0.1)] transition-all duration-500 group relative">
+                                                {/* Smart Badges */}
+                                                {smartStatus && (
+                                                    <div className={`absolute top-8 left-8 z-20 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] shadow-lg border backdrop-blur-md flex items-center gap-2 animate-in zoom-in duration-500 ${smartStatus.type === 'benefit' ? 'bg-green-500/90 text-white border-green-400' : 'bg-amber-500/90 text-white border-amber-400'}`}>
+                                                        {smartStatus.type === 'benefit' ? <SparklesIcon className="w-3 h-3" /> : <ExclamationTriangleIcon className="w-3 h-3" />}
+                                                        {smartStatus.message}
+                                                    </div>
+                                                )}
+
+                                                {/* Image Placeholder */}
+                                                <div className="aspect-[4/5] bg-gray-50 rounded-[2rem] mb-6 flex items-center justify-center overflow-hidden border border-gray-50 group-hover:border-indigo-50 transition-colors relative">
+                                                    <ArchiveBoxIcon className="w-16 h-16 text-gray-200 group-hover:scale-110 transition-transform duration-500" />
+                                                </div>
+
+                                                <div className="px-4 pb-6">
+                                                    <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                        <span className="w-1 h-1 bg-amber-500 rounded-full"></span>
+                                                        {product.subCategory}
+                                                    </p>
+                                                    <h4 className="text-xl font-black text-gray-900 mb-4 group-hover:text-indigo-600 transition-colors line-clamp-2 h-14">
+                                                        {product.name}
+                                                    </h4>
+
+                                                    {/* Benefits Tags */}
+                                                    <div className="flex flex-wrap gap-2 mb-6 min-h-[20px]">
+                                                        {product.benefits?.slice(0, 2).map(b => (
+                                                            <span key={b} className="text-[8px] font-black text-gray-400 uppercase tracking-widest border border-gray-100 px-2 py-0.5 rounded-lg">{b}</span>
+                                                        ))}
+                                                    </div>
+
+                                                    <button
+                                                        onClick={() => handleAddToCart(product)}
+                                                        className="w-full bg-gray-900 text-white py-5 rounded-[1.5rem] text-xs font-black uppercase tracking-widest hover:bg-indigo-600 transition-all active:scale-95 shadow-xl shadow-gray-900/10 hover:shadow-indigo-600/30 flex items-center justify-center gap-3"
+                                                    >
+                                                        <PlusIcon className="w-4 h-4" />
+                                                        Add to Bag
+                                                    </button>
                                                 </div>
                                             </div>
-
-                                            <div className="px-4 pb-6">
-                                                <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                                    <span className="w-1 h-1 bg-amber-500 rounded-full"></span>
-                                                    {product.subCategory}
-                                                </p>
-                                                <h4 className="text-xl font-black text-gray-900 mb-6 group-hover:text-indigo-600 transition-colors line-clamp-2 h-14">
-                                                    {product.name}
-                                                </h4>
-
-                                                <button
-                                                    onClick={() => handleAddToCart(product)}
-                                                    className="w-full bg-gray-900 text-white py-5 rounded-[1.5rem] text-xs font-black uppercase tracking-widest hover:bg-indigo-600 transition-all active:scale-95 shadow-xl shadow-gray-900/10 hover:shadow-indigo-600/30 flex items-center justify-center gap-3"
-                                                >
-                                                    <PlusIcon className="w-4 h-4" />
-                                                    Add to Bag
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
 
                                 {catalogBySelection.length === 0 && (

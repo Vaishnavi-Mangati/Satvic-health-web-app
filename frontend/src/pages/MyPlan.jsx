@@ -3,6 +3,7 @@ import { UserContext } from '../context/UserContext';
 import { getPlan, getProgress, toggleProgress } from '../services/api';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { SparklesIcon } from '@heroicons/react/24/outline';
 
 const MyPlan = () => {
     const { bodyType, user } = useContext(UserContext);
@@ -21,8 +22,15 @@ const MyPlan = () => {
     useEffect(() => {
         if (bodyType) {
             setLoading(true);
+
+            const healthData = {
+                height: user?.physicalStats?.height,
+                weight: user?.physicalStats?.weight,
+                healthConditions: user?.healthConditions
+            };
+
             Promise.all([
-                getPlan(bodyType),
+                getPlan(bodyType, healthData),
                 getProgress(userId, todayDate)
             ])
                 .then(([planData, progressData]) => {
@@ -35,7 +43,7 @@ const MyPlan = () => {
                     setLoading(false);
                 });
         }
-    }, [bodyType, userId, todayDate]);
+    }, [bodyType, userId, todayDate, user]);
 
     const handleToggle = async (itemId, type) => {
         try {
@@ -108,8 +116,16 @@ const MyPlan = () => {
                                 <h2 className="text-2xl font-bold text-gray-800">Today, {dayName}</h2>
                                 <p className="text-sm text-gray-500 mt-1">Focus on consistency to see results.</p>
                             </div>
-                            <div className="text-sm bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full font-bold shadow-sm">
-                                {completedItems.length} / {(todayPlan?.meals.length || 0) + (todayPlan?.exercises.length || 0)} Total Tasks
+                            <div className="flex items-center gap-3">
+                                {plan?.intelligenceActive && (
+                                    <div className="text-[10px] bg-amber-500 text-white px-3 py-1.5 rounded-full font-black uppercase tracking-widest flex items-center gap-2 animate-pulse shadow-lg shadow-amber-500/20">
+                                        <SparklesIcon className="w-3 h-3" />
+                                        Health Intelligence Active
+                                    </div>
+                                )}
+                                <div className="text-sm bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full font-bold shadow-sm">
+                                    {completedItems.length} / {(todayPlan?.meals.length || 0) + (todayPlan?.exercises.length || 0)} Total Tasks
+                                </div>
                             </div>
                         </div>
 
@@ -147,7 +163,11 @@ const MyPlan = () => {
                                                 </p>
                                                 <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-500 font-bold">{meal.calories} kcal</span>
                                             </div>
-                                            <p className="text-sm text-gray-500 leading-relaxed">{meal.ingredients.join(', ')}</p>
+                                            <div className="flex flex-wrap gap-2 mt-2">
+                                                <p className="text-sm text-gray-500 leading-relaxed">{meal.ingredients.join(', ')}</p>
+                                                {meal.diabetesOverlay && <span className="text-[9px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100 uppercase tracking-widest flex items-center gap-1"><SparklesIcon className="w-2 h-2" /> Diabetes Swap</span>}
+                                                {meal.hpnOverlay && <span className="text-[9px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg border border-indigo-100 uppercase tracking-widest flex items-center gap-1"><SparklesIcon className="w-2 h-2" /> BP Optimized</span>}
+                                            </div>
                                         </div>
                                     </div>
                                 ))}

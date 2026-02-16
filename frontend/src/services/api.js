@@ -26,9 +26,23 @@ export const loginUser = async (credentials) => {
   return response.data;
 };
 
-export const getPlan = async (bodyType) => {
+export const getPlan = async (bodyType, healthData = {}) => {
   try {
-    const response = await api.get(`/plans/${bodyType}`);
+    const { height, weight, healthConditions } = healthData;
+    let url = `/plans/${bodyType}`;
+    
+    const params = new URLSearchParams();
+    if (height) params.append('height', height);
+    if (weight) params.append('weight', weight);
+    if (healthConditions && healthConditions.length > 0) {
+      params.append('conditions', healthConditions.join(','));
+    }
+    
+    if (params.toString()) {
+      url += `?${params.toString()}`;
+    }
+
+    const response = await api.get(url);
     return response.data;
   } catch (error) {
     console.error("Error fetching plan:", error);

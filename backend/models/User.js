@@ -14,6 +14,16 @@ const userSchema = new mongoose.Schema({
     pitta: { type: Number, default: 0 },
     kapha: { type: Number, default: 0 }
   },
+  physicalStats: {
+    height: { type: Number, default: 0 }, // in cm
+    weight: { type: Number, default: 0 }, // in kg
+    bmi: { type: Number, default: 0 },
+    category: { type: String, default: null } // Underweight, Normal, Overweight, Obese
+  },
+  healthConditions: [{
+    type: String,
+    enum: ['Diabetes', 'High BP', 'Low BP', 'PCOS/PCOD', 'Thyroid', 'IBS', 'None']
+  }],
   cartItems: [{
     name: { type: String, required: true },
     isBought: { type: Boolean, default: false },
