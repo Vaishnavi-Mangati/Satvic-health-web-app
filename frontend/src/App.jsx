@@ -1,7 +1,7 @@
 import Quiz from './pages/Quiz'
 import Result from './pages/Result'
 import Navbar from './components/Navbar'
-import Home from './pages/Home'
+import LandingPage from './pages/LandingPage'
 import { Route, Routes } from 'react-router-dom'
 import MyPlan from './pages/MyPlan'
 import MarketCart from './pages/MarketCart'
@@ -16,7 +16,7 @@ const App = () => {
     <Routes>
       <Route path='/quiz' element={<Quiz />} />
       <Route path='/result' element={<Result />} />
-      <Route path='/' element={<Home />} />
+      <Route path='/' element={<LandingPage />} />
       <Route path='/login' element={<Login />} />
       <Route path='/register' element={<Register />} />
       <Route path='/my-plan' element={<ProtectedRoute><MyPlan /></ProtectedRoute>} />

@@ -51,10 +51,52 @@ This document provides a comprehensive technical overview of the progress and cu
 
 ---
 
+<<<<<<< Updated upstream
 ## ✅ Current Development Status
 - **Core Framework**: 100% Complete.
 - **Personalization**: Fully automated Ayurvedic (Dosha) + Clinical (BMI/Conditions) hybrid system.
 - **Marketplace**: Smart matchmaking engine and bag lifecycle finalized.
+=======
+## 📂 Granular Directory Structure
+
+```text
+/
+├── backend/
+│   ├── middleware/auth.js      # JWT Verification
+│   ├── models/
+│   │   ├── User.js              # Identity & Scores
+│   │   ├── Plan.js              # Dosha-specific content
+│   │   └── DailyProgress.js     # User daily tracking
+│   ├── routes/
+│   │   ├── authRoutes.js        # /api/auth/...
+│   │   ├── planRoutes.js        # /api/plans/...
+│   │   └── progressRoutes.js    # /api/progress/...
+│   └── server.js                # Express config & DB connection
+├── src/
+│   ├── context/UserContext.jsx # Global User State
+│   ├── services/api.js         # Centralized Axios logic
+│   ├── data/
+│   │   ├── questions.js         # 15-question quiz data
+│   │   └── recommendations.js   # Hardcoded Dosha facts
+│   ├── pages/
+│   │   ├── LandingPage.jsx      # [NEW] Main Home Page
+│   │   ├── Dashboard.jsx        # Data visualization
+│   │   ├── Quiz.jsx             # Interactive assessment
+│   │   ├── MyPlan.jsx           # Task management
+│   │   └── Login/Register       # Entry points
+│   └── components/
+│       ├── home/                # [NEW] Landing Page Components
+│       │   ├── HeroSection.jsx
+│       │   ├── AboutSection.jsx
+│       │   ├── DoshaSection.jsx
+│       │   ├── FeaturesSection.jsx
+│       │   └── CTASection.jsx
+│       ├── Navbar.jsx           # Dynamic navigation
+│       ├── Footer.jsx           # [NEW] Site footer
+│       └── ProtectedRoute.jsx   # Auth guard for frontend
+└── PROJECT_NOTES.md            # You are here
+```
+>>>>>>> Stashed changes
 
 ---
 *Last Technical Audit: 2026-02-16*
