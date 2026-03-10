@@ -122,7 +122,7 @@ const Result = () => {
               <p className="text-gray-500 font-medium mb-12 max-w-sm mx-auto">Create a profile to save your BMI-adjusted {data.title} plan and track daily healing markers.</p>
 
               <button
-                onClick={() => navigate('/register', { state: { vataScore, pittaScore, kaphaScore, height, weight, healthConditions } })}
+                onClick={() => navigate('/register', { state: { vataScore, pittaScore, kaphaScore, height, weight, healthConditions, bodyType } })}
                 className='bg-indigo-600 text-white px-16 py-6 rounded-3xl text-sm font-black uppercase tracking-[0.2em] hover:bg-gray-900 transition-all shadow-2xl shadow-indigo-600/20 hover:shadow-gray-900/30 transform hover:-translate-y-1 active:scale-95'
               >
                 Sign Up to Save Progress

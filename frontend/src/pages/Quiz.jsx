@@ -24,7 +24,7 @@ const Quiz = () => {
   const [quizStep, setQuizStep] = useState('ayurveda'); // 'ayurveda', 'stats', 'health'
   const [error, setError] = useState('');
 
-  if (user) {
+  if (user && user.bodyType) {
     return <Navigate to="/dashboard" replace />;
   }
 

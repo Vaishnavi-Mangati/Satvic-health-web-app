@@ -128,4 +128,59 @@ router.get('/profile', async (req, res) => {
     // This will be protected by middleware later
 });
 
+// Update User Profile (Protected)
+router.put('/profile', require('../middleware/auth'), async (req, res) => {
+  try {
+    const { name, bodyType, scores, height, weight, healthConditions } = req.body;
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (name) user.name = name;
+    if (bodyType) user.bodyType = bodyType;
+    if (scores) user.scores = scores;
+    
+    // Update physical stats if provided
+    if (height !== undefined || weight !== undefined) {
+      const h = height !== undefined ? height : user.physicalStats.height;
+      const w = weight !== undefined ? weight : user.physicalStats.weight;
+      
+      let bmi = 0;
+      let category = 'Normal';
+      if (h > 0 && w > 0) {
+        const heightInMeters = h / 100;
+        bmi = parseFloat((w / (heightInMeters * heightInMeters)).toFixed(1));
+        
+        if (bmi < 18.5) category = 'Underweight';
+        else if (bmi < 25) category = 'Normal';
+        else if (bmi < 30) category = 'Overweight';
+        else category = 'Obese';
+      }
+      
+      user.physicalStats = { height: h, weight: w, bmi, category };
+    }
+
+    if (healthConditions) {
+      user.healthConditions = healthConditions;
+    }
+
+    await user.save();
+
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      bodyType: user.bodyType,
+      scores: user.scores,
+      physicalStats: user.physicalStats,
+      healthConditions: user.healthConditions
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
 module.exports = router;

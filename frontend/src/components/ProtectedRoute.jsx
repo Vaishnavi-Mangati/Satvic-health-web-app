@@ -10,6 +10,11 @@ const ProtectedRoute = ({ children }) => {
         return <Navigate to="/" replace />;
     }
 
+    if (!user.bodyType) {
+        // Enforce Quiz First if body type is missing
+        return <Navigate to="/quiz" replace />;
+    }
+
     return children;
 };
 
