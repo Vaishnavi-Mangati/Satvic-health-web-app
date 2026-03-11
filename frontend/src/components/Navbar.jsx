@@ -21,12 +21,24 @@ export default function Navbar() {
   const { user, logout } = useContext(UserContext);
 
   const filteredNavigation = navigation.filter(item => {
+    // If not logged in, only see "Take Quiz" and Landing
+    if (!user) {
+      return item.name === 'Take Quiz';
+    }
+
+    // If logged in but no body type, MUST take quiz first
+    if (!user.bodyType) {
+      return item.name === 'Take Quiz';
+    }
+
+    // If logged in with body type, see everything EXCEPT "Take Quiz"
     if (['Dashboard', 'My Plan', 'Smart Cart'].includes(item.name)) {
-      return !!user; // Only members see these
+      return true;
     }
-    if (item.name === 'Take Quiz' && user) {
-      return false; // Members don't take quiz again
+    if (item.name === 'Take Quiz') {
+      return false;
     }
+    
     return true;
   });
 

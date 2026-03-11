@@ -51,12 +51,11 @@ This document provides a comprehensive technical overview of the progress and cu
 
 ---
 
-<<<<<<< Updated upstream
 ## ✅ Current Development Status
 - **Core Framework**: 100% Complete.
 - **Personalization**: Fully automated Ayurvedic (Dosha) + Clinical (BMI/Conditions) hybrid system.
 - **Marketplace**: Smart matchmaking engine and bag lifecycle finalized.
-=======
+
 ## 📂 Granular Directory Structure
 
 ```text
@@ -96,7 +95,6 @@ This document provides a comprehensive technical overview of the progress and cu
 │       └── ProtectedRoute.jsx   # Auth guard for frontend
 └── PROJECT_NOTES.md            # You are here
 ```
->>>>>>> Stashed changes
 
 ---
 *Last Technical Audit: 2026-02-16*

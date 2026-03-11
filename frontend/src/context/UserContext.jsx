@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { updateProfile } from '../services/api';
 
 export const UserContext = createContext();
 
@@ -17,11 +18,26 @@ export const UserProvider = ({ children }) => {
         }
     }, []);
 
-    const login = (data) => {
+    const login = async (data) => {
         console.log("UserContext: Logging in user:", data.user.id);
-        setUser(data.user);
-        if (data.user.bodyType) setBodyType(data.user.bodyType);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        let updatedUser = data.user;
+        
+        // If user has no bodyType in backend but we have one locally, sync it
+        if (!updatedUser.bodyType && bodyType) {
+            try {
+                // Sync to backend
+                updatedUser = await updateProfile({ 
+                    bodyType,
+                    // If we have scores/stats in registration state we could sync them too
+                });
+            } catch (err) {
+                console.error("Failed to sync local bodyType on login:", err);
+            }
+        }
+
+        setUser(updatedUser);
+        if (updatedUser.bodyType) setBodyType(updatedUser.bodyType);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
         localStorage.setItem('token', data.token);
     };
 
@@ -33,10 +49,20 @@ export const UserProvider = ({ children }) => {
         window.location.href = '/';
     };
 
-    const saveBodyType = (type) => {
+    const saveBodyType = async (type) => {
         setBodyType(type);
         localStorage.setItem('bodyType', type);
-        // If logged in, we should ideally sync this to backend
+        
+        // If logged in, sync this to backend
+        if (user) {
+            try {
+                const updatedUser = await updateProfile({ bodyType: type });
+                setUser(updatedUser);
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+            } catch (err) {
+                console.error("Failed to sync bodyType to backend:", err);
+            }
+        }
     };
 
     return (
