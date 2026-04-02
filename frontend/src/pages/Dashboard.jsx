@@ -292,6 +292,73 @@ const Dashboard = () => {
                     </div>
                 </div>
 
+                {/* 🟢 WEEKLY */}
+                <div className="bg-white rounded-3xl p-6 shadow-[0_8px_20px_rgba(0,0,0,0.04)] border border-[#eef2ee]">
+
+                    {/* HEADER */}
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-sm font-semibold text-gray-800">
+                            Weekly Momentum
+                        </h3>
+
+                        {/* 🔥 TREND */}
+                        <div className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                            diff > 0 
+                                ? "bg-emerald-100 text-emerald-700" 
+                                : diff < 0 
+                                ? "bg-rose-100 text-rose-600"
+                                : "bg-gray-100 text-gray-600"
+                        }`}>
+                            {diff > 0 && `↑ +${diff}`}
+                            {diff < 0 && `↓ ${diff}`}
+                            {diff === 0 && `No change`}
+                        </div>
+                    </div>
+
+                    {/* MAIN NUMBER */}
+                    <div className="text-3xl font-bold text-gray-900 mb-1">
+                        {weeklyTotal}
+                    </div>
+
+                    <p className="text-sm text-gray-500 mb-4">
+                        habits completed this week
+                    </p>
+
+                    {/* CHART */}
+                    <ResponsiveContainer width="100%" height={150}>
+                        <BarChart data={weeklyData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                            <XAxis dataKey="day"
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fontSize: 10 }}
+                            />
+                            <ChartTooltip 
+                                cursor={{ fill: 'transparent' }}
+                                contentStyle={{
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    fontSize: '10px'
+                                }}
+                            />
+                            <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                                {weeklyData.map((entry, index) => (
+                                    <Cell
+                                        key={index}
+                                        fill={
+                                            entry.count > 2
+                                                ? '#10b981'
+                                                : entry.count > 0
+                                                ? '#6366f1'
+                                                : '#e5e7eb'
+                                        }
+                                    />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+
+                </div>
+
                 {/* HeatMap */}
                 <div className="bg-white rounded-3xl p-6 shadow-[0_8px_20px_rgba(0,0,0,0.04)] border border-[#eef2ee]">
 
